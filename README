@@ -1,0 +1,36 @@
+Insilicut - in silico cutting of genomic DNA with restriction enzyme
+====================================================================
+
+This directory contains insilicut, a minimal package reporting fragments when
+cutting in silico genomic DNA with a restriction enzyme. It is potentially 
+useful when planning a genotyping-by-sequencing (GBS) experiment (also known 
+as restriction-assisted DNA sequencing, RAD-seq).
+
+Insilicut is free software, you can redistribute it and/or modify it under
+the terms of the CeCILL license, compatible with the GNU Public License (GPL).
+More details at http://www.cecill.info/index.en.html
+
+The code is hosted online: https://github.com/timflutre/insilicut
+
+
+Installation
+============
+
+Insilicut doesn't need any compilation as it only contains scripts in bash, 
+awk, python and R.
+
+To install it in ~/bin, simply type:
+	make install
+
+You can also specify another directory, for instance:
+	make install INSTALLDIR="~/tmp"
+
+
+More information about insilicut
+================================
+
+You can access the manual in command-line via:
+	man ./doc/insilicut.man
+
+To re-generate the manual in PDF format, type:
+	make pdf
