@@ -4,10 +4,10 @@ all:
 	@echo "this package requires no compilation"
 
 check:
-	@echo "this package has no test (yet)"
+	./tests/test_func.bash --p2i $(PWD)
 
-install: scripts/insilicut.bash scripts/extract_fragments.py
-	cp scripts/insilicut.bash scripts/extract_fragments.py ${INSTALLDIR}
+install: scripts/insilicut.bash scripts/insilicut_extract_fragments.py
+	cp scripts/insilicut.bash scripts/insilicut_extract_fragments.py ${INSTALLDIR}
 
 insilicut.man: scripts/insilicut.bash
 	help2man -N -o doc/insilicut.man ./scripts/insilicut.bash

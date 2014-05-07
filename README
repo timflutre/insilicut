@@ -16,10 +16,21 @@ The code is hosted online: https://github.com/timflutre/insilicut
 Installation
 ============
 
-Insilicut doesn't need any compilation as it only contains scripts in bash, 
-awk, python and R.
+Insilicut doesn't need any compilation as it only contains scripts. However, 
+it still has a few requirements:
+* Bash and Awk;
+* PaTMaN (https://bioinf.eva.mpg.de/patman/);
+* Python (version >= 2.7 or 3.1);
+* R (optional, version >= 2.15).
 
-To install it in ~/bin, simply type:
+First, download the package, for instance:
+       wget --no-check-certificate https://github.com/timflutre/insilicut/archive/master.zip
+       unzip master; rm -f master; cd insilicut-master
+
+Then, run the tests:
+     make check
+
+Finally, to install the package in ~/bin, simply type:
 	make install
 
 You can also specify another directory, for instance:

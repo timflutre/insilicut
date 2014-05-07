@@ -25,6 +25,8 @@ function help () {
     msg+="      --ls\tlower bound on fragments size (default=100)\n"
     msg+="      --us\tupper bound on fragments size (default=300)\n"
     msg+="      --clean\tremove temporary files\n"
+    msg+="      --p2i\tabsolute path to the insilicut directory (default="")\n"
+    msg+="\t\tused for testing purposes only (e.g. in 'make check')\n"
     msg+="\n"
     msg+="Examples:\n"
     msg+="  ${0##*/} --gf Athaliana_genome.fa --gn Athaliana --ef ApeKI.fa --en ApeKI\n"
@@ -69,7 +71,7 @@ function timer () {
 function parseCmdLine () {
     getopt -T > /dev/null # portability check (say, Linux or Mac OS?)
     if [ $? -eq 4 ]; then # GNU enhanced getopt is available
-	TEMP=`getopt -o hVv:g:e: -l help,version,verbose:,gf:,gn:,ef:,en:,clean \
+	TEMP=`getopt -o hVv:g:e: -l help,version,verbose:,gf:,gn:,ef:,en:,clean,p2i: \
         -n "$0" -- "$@"`
     else # original getopt is available (no long options, whitespace, sorting)
 	TEMP=`getopt hVv:g:e: "$@"`
@@ -94,6 +96,7 @@ on your system, use -h for help"
             --ef) enzymeFile=$2; shift 2;;
 	    --en) enzymeName=$2; shift 2;;
 	    --clean) cleanTmp=true; shift;;
+	    --p2i) pathToInsilicut=$2; shift 2;;
             --) shift; break;;
             *) echo "ERROR: options parsing failed, use -h for help"; exit 1;;
         esac
@@ -132,9 +135,17 @@ on your system, use -h for help"
 	echo -e "ERROR: can't find program 'patman' (https://bioinf.eva.mpg.de/patman/) in PATH\n"
 	exit 1
     fi
-    if ! hash extract_fragments.py 2>/dev/null; then
-	echo -e "ERROR: can't find program 'extract_fragments.py' in PATH\n"
-	exit 1
+    if [ -z "${pathToInsilicut}" ]; then
+	if ! hash insilicut_extract_fragments.py 2>/dev/null; then
+	    echo -e "ERROR: can't find program 'insilicut_extract_fragments.py' in PATH\n"
+	    exit 1
+	fi
+    else
+	pathToInsilicut="${pathToInsilicut}/scripts/"
+	if [ ! -f "${pathToInsilicut}insilicut_extract_fragments.py" ]; then
+	    echo -e "ERROR: can't find program 'insilicut_extract_fragments.py' in package\n"
+	    exit 1
+	fi
     fi
 }
 
@@ -167,7 +178,7 @@ function run () {
 	echo -e "extract fragments (with Python)..."
     fi
     if [ ! -f "${tmpPrefix}_frags.bed.gz" ]; then
-	extract_fragments.py -i ${tmpPrefix}.bed.gz -s ${lowerSize} -S ${upperSize} -v ${verbose} >& stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt
+	${pathToInsilicut}insilicut_extract_fragments.py -i ${tmpPrefix}.bed.gz -s ${lowerSize} -S ${upperSize} -v ${verbose} >& stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt
 	if [ $verbose -gt "0" ]; then
 	    echo -e $(grep "nb of kept fragments" stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt)
 	    echo -e "more details in file stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt"
@@ -195,6 +206,7 @@ enzymeName=""
 lowerSize="100"
 upperSize="300"
 cleanTmp=false
+pathToInsilicut=""
 parseCmdLine "$@"
 
 if [ $verbose -gt "0" ]; then
@@ -205,7 +217,7 @@ if [ $verbose -gt "0" ]; then
     echo -e $msg
 fi
 
-run genomeFile genomeName enzymeFile enzymeName lowerSize upperSize cleanTmp verbose
+run genomeFile genomeName enzymeFile enzymeName lowerSize upperSize cleanTmp pathToInsilicut verbose
 
 if [ $verbose -gt "0" ]; then
     msg="END ${0##*/} $(date +"%Y-%m-%d") $(date +"%H:%M:%S")"
