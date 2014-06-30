@@ -2,7 +2,7 @@
 
 # Aim: report fragments when cutting genomic DNA with a restriction enzyme
 # Copyright (C) 2014 Institut National de la Recherche Agronomique (INRA)
-# License: CeCILL (http://www.cecill.info/index.en.html)
+# License: GPL-3+
 # Author: Timothée Flutre
 
 progVersion="1.0"
@@ -43,7 +43,9 @@ function version () {
     msg="${0##*/} ${progVersion}\n"
     msg+="\n"
     msg+="Copyright (C) 2014 Institut National de la Recherche Agronomique (INRA).\n"
-    msg+="License CeCILL: http://www.cecill.info/index.en.html\n"
+    msg+="License GPL-3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+    msg+="This is free software; see the source for copying conditions. There is NO\n"
+    msg+="warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
     msg+="\n"
     msg+="Written by Timothée Flutre."
     echo -e "$msg"

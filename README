@@ -6,9 +6,15 @@ cutting in silico genomic DNA with a restriction enzyme. It is potentially
 useful when planning a genotyping-by-sequencing (GBS) experiment (also known 
 as restriction-assisted DNA sequencing, RAD-seq).
 
-Insilicut is free software, you can redistribute it and/or modify it under
-the terms of the CeCILL license, compatible with the GNU Public License (GPL).
-More details at http://www.cecill.info/index.en.html
+This package (copyright INRA) is free software, you can redistribute it 
+and/or modify it under the terms of the GNU General Public License (GPL-3).
+
+The GNU General Public License does not permit this software to be
+redistributed in proprietary programs.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 The code is hosted online: https://github.com/timflutre/insilicut
 
@@ -24,24 +30,26 @@ it still has a few requirements:
 * R (optional, version >= 2.15).
 
 First, download the package, for instance:
-       wget --no-check-certificate https://github.com/timflutre/insilicut/archive/master.zip
-       unzip master; rm -f master; cd insilicut-master
+    wget --no-check-certificate https://github.com/timflutre/insilicut/archive/master.zip
+    unzip master; rm -f master; cd insilicut-master
 
 Then, run the tests:
-     make check
+    make check
 
-Finally, to install the package in ~/bin, simply type:
-	make install
+Finally, install the package:
+    make install
 
-You can also specify another directory, for instance:
-	make install INSTALLDIR="~/tmp"
+By default everything is installed in a directory bin/ in ${HOME}. If the 
+bin/ directory does not exist, it will be created. To install elsewhere, use 
+the option INSTALL, for instance:
+    make install INSTALLDIR="/usr/local"
 
 
-More information about insilicut
-================================
+Documentation
+=============
 
 You can access the manual in command-line via:
-	man ./doc/insilicut.man
+    man ./doc/insilicut.man
 
 To re-generate the manual in PDF format, type:
-	make pdf
+    make pdf

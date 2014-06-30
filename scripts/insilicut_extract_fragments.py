@@ -4,7 +4,7 @@
 # Aim: extract non-overlapping fragments in a given size range from a BED file
 # containing restriction sites from in silico RAD-seq
 # Copyright (C) 2014 Institut National de la Recherche Agronomique (INRA)
-# License: CeCILL (http://www.cecill.info/index.en.html)
+# License: GPL-3+
 # Author: Timothée Flutre
 
 # to allow code to work with Python 2 and 3
@@ -86,8 +86,10 @@ class ExtractFragments(object):
         """
         msg = "%s 1.0\n" % os.path.basename(sys.argv[0])
         msg += "\n"
-        msg += "Copyright (C) 2014 Institut National de la Recherche Agronomique (INRA.\n"
-        msg += "License CeCILL: http://www.cecill.info/index.en.htm\n"
+        msg += "Copyright (C) 2014 Institut National de la Recherche Agronomique (INRA).\n"
+        msg += "License GPL-3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+        msg += "This is free software; see the source for copying conditions. There is NO\n"
+        msg += "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
         msg += "\n"
         msg += "Written by Timothée Flutre."
         print(msg.encode("utf8")); sys.stdout.flush()
