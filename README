@@ -42,7 +42,7 @@ Finally, install the package:
 By default everything is installed in a directory bin/ in ${HOME}. If the 
 bin/ directory does not exist, it will be created. To install elsewhere, use 
 the option INSTALL, for instance:
-    make install INSTALLDIR="/usr/local"
+    make install INSTALL="/usr/local"
 
 
 Documentation
