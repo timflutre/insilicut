@@ -24,7 +24,13 @@ import copy
 import numpy as np
 # import scipy as sp
 
-
+if sys.version_info[0] == 2:
+    if sys.version_info[1] < 7:
+        msg = "ERROR: Python should be in version 2.7 or higher"
+        sys.stderr.write("%s\n\n" % msg)
+        sys.exit(1)
+        
+        
 class Bed(object):
     def __init__(self, chrom, start, end, name, score=None, strand=None):
         self.chrom = chrom
