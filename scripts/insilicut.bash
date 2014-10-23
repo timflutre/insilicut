@@ -73,10 +73,9 @@ function timer () {
 function parseCmdLine () {
     getopt -T > /dev/null # portability check (say, Linux or Mac OS?)
     if [ $? -eq 4 ]; then # GNU enhanced getopt is available
-	TEMP=`getopt -o hVv:g:e: -l help,version,verbose:,gf:,gn:,ef:,en:,clean,p2i: \
-        -n "$0" -- "$@"`
+	TEMP=`getopt -o hVv:g:e: -l help,version,verbose:,gf:,gn:,ef:,en:,ls:,us:,clean,p2i: -n "$0" -- "$@"`
     else # original getopt is available (no long options, whitespace, sorting)
-	TEMP=`getopt hVv:g:e: "$@"`
+	TEMP=`getopt hVv: "$@"`
     fi
     if [ $? -ne 0 ]; then
 	echo "ERROR: "$(which getopt)" failed"
@@ -97,6 +96,8 @@ on your system, use -h for help"
 	    --gn) genomeName=$2; shift 2;;
             --ef) enzymeFile=$2; shift 2;;
 	    --en) enzymeName=$2; shift 2;;
+	    --ls) lowerSize=$2; shift 2;;
+	    --us) upperSize=$2; shift 2;;
 	    --clean) cleanTmp=true; shift;;
 	    --p2i) pathToInsilicut=$2; shift 2;;
             --) shift; break;;
@@ -160,44 +161,52 @@ function run () {
     if [ ! -f "${tmpPrefix}.txt" ]; then
 	patman -P ${enzymeFile} -D ${genomeFile} -e 0 -g 0 -o ${tmpPrefix}.txt -a -s
     fi
+    nbCutSites=$(wc -l < ${tmpPrefix}.txt)
     if [ $verbose -gt "0" ]; then
-	echo -e "nb of cut sites: "$(wc -l < ${tmpPrefix}.txt)
+	echo -e "nb of cut sites: "$nbCutSites
     fi
     
-    # step 2 ------------------------------------------------------------------
-    if [ $verbose -gt "0" ]; then
-	echo -e "convert output into BED format (with AWK)..."
-    fi
-    if [ ! -f "${tmpPrefix}.bed.gz" ]; then
-	cat ${tmpPrefix}.txt | awk -F "\t" '{print $1"\t"$3-1"\t"$4"\t"$2"\t1000\t"$5}' | gzip > ${tmpPrefix}.bed.gz
-    fi
-    if $cleanTmp; then
-	rm -f ${tmpPrefix}.txt
-    fi
-    
-    # step 3 ------------------------------------------------------------------
-    if [ $verbose -gt "0" ]; then
-	echo -e "extract fragments (with Python)..."
-    fi
-    if [ ! -f "${tmpPrefix}_frags.bed.gz" ]; then
-	${pathToInsilicut}insilicut_extract_fragments.py -i ${tmpPrefix}.bed.gz -s ${lowerSize} -S ${upperSize} -v ${verbose} >& stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt
-	if [ $verbose -gt "0" ]; then
-	    echo -e $(grep "nb of kept fragments" stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt)
-	    echo -e "more details in file stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt"
+    if [ $nbCutSites -eq "0" ]; then
+	if $cleanTmp; then
+	    rm -f ${tmpPrefix}.txt
 	fi
-    fi
-    if $cleanTmp; then
-	rm -f ${tmpPrefix}.bed.gz
-    fi
-    
-    # step 4 ------------------------------------------------------------------
-    if hash R 2>/dev/null; then
+    else
+	# step 2 ------------------------------------------------------------------
 	if [ $verbose -gt "0" ]; then
-	    echo -e "plot histogram of kept fragment sizes (with R)..."
+	    echo -e "convert output into BED format (with AWK)..."
 	fi
-	cmd="x <- read.table(\"${tmpPrefix}_frags.bed.gz\", sep=\"\t\"); tmp <- x[,3] - x[,2]; pdf(\"hist_frags_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.pdf\"); hist(tmp[tmp <= quantile(tmp, 0.75)], main=\"${enzymeName} fragments on ${genomeName}\", xlab=\"fragment size (bp)\"); abline(v=${lowerSize}, lwd=2, col=\"red\"); abline(v=${upperSize}, lwd=2, col=\"red\"); dev.off()"
-	echo $cmd | R --vanilla --quiet >/dev/null 2>&1
-    fi
+	if [ ! -f "${tmpPrefix}.bed.gz" ]; then
+	    cat ${tmpPrefix}.txt | awk -F "\t" '{print $1"\t"$3-1"\t"$4"\t"$2"\t1000\t"$5}' | gzip > ${tmpPrefix}.bed.gz
+	fi
+	if $cleanTmp; then
+	    rm -f ${tmpPrefix}.txt
+	fi
+	
+	# step 3 ------------------------------------------------------------------
+	if [ $verbose -gt "0" ]; then
+	    echo -e "extract fragments (with Python)..."
+	fi
+	if [ ! -f "${tmpPrefix}_frags.bed.gz" ]; then
+	    ${pathToInsilicut}insilicut_extract_fragments.py -i ${tmpPrefix}.bed.gz -s ${lowerSize} -S ${upperSize} -v ${verbose} >& stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt
+	    if [ $verbose -gt "0" ]; then
+		echo -e $(grep "nb of kept fragments" stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt)
+		echo -e "more details in file stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt"
+	    fi
+	fi
+	if $cleanTmp; then
+	    rm -f ${tmpPrefix}.bed.gz
+	fi
+	
+	# step 4 ------------------------------------------------------------------
+	if hash R 2>/dev/null; then
+	    if [ $verbose -gt "0" ]; then
+		echo -e "plot histogram of kept fragment sizes (with R)..."
+	    fi
+	    cmd="x <- read.table(\"${tmpPrefix}_frags.bed.gz\", sep=\"\t\"); tmp <- x[,3] - x[,2]; pdf(\"hist_frags_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.pdf\"); hist(tmp[tmp <= quantile(tmp, 0.75)], main=\"${enzymeName} fragments on ${genomeName}\", xlab=\"fragment size (bp)\", breaks=\"FD\"); abline(v=${lowerSize}, lwd=2, col=\"red\"); abline(v=${upperSize}, lwd=2, col=\"red\"); dev.off()"
+	    echo $cmd | R --vanilla --quiet >/dev/null 2>&1
+	fi
+	
+    fi # nbCutSites > 0
 }
 
 verbose=1
