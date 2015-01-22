@@ -30,7 +30,9 @@ if sys.version_info[0] == 2:
         sys.stderr.write("%s\n\n" % msg)
         sys.exit(1)
         
-        
+progVersion = "1.0.0" # http://semver.org/
+
+
 class Bed(object):
     def __init__(self, chrom, start, end, name, score=None, strand=None):
         self.chrom = chrom
@@ -90,7 +92,7 @@ class ExtractFragments(object):
         """
         Display version and license information on stdout.
         """
-        msg = "%s 1.0\n" % os.path.basename(sys.argv[0])
+        msg = "%s %s\n" % (os.path.basename(sys.argv[0]), progVersion)
         msg += "\n"
         msg += "Copyright (C) 2014 Institut National de la Recherche Agronomique (INRA).\n"
         msg += "License GPL-3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"

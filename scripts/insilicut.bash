@@ -5,7 +5,7 @@
 # License: GPL-3+
 # Author: Timothée Flutre
 
-progVersion="1.0"
+progVersion="1.0.O" # http://semver.org/
 
 # Display the help on stdout.
 # The format complies with help2man (http://www.gnu.org/s/help2man)
