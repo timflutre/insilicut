@@ -1,5 +1,5 @@
-VERSION=1.0.0 # http://semver.org/
 INSTALL=${HOME}
+VERSION=1.0.1
 
 all:
 	@echo "this package requires no compilation"
@@ -21,9 +21,12 @@ pdf: doc/insilicut.man
 
 dist:
 	mkdir -p insilicut-${VERSION}
-	cp AUTHORS LICENSE Makefile NEWS README TODO insilicut-${VERSION}/
+	cp AUTHORS COPYING Makefile NEWS README TODO insilicut-${VERSION}/
 	cp -r doc/ insilicut-${VERSION}/
 	cp -r scripts/ insilicut-${VERSION}/
 	mkdir -p insilicut-${VERSION}/tests; cp tests/test_func.bash insilicut-${VERSION}/tests/
 	tar -czvf insilicut-${VERSION}.tar.gz insilicut-${VERSION}/
 	rm -rf insilicut-${VERSION}
+
+uninstall:
+	rm ${INSTALL}/bin/insilicut.bash ${INSTALL}/bin/insilicut_extract_fragments.py
