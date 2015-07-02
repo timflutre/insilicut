@@ -6,7 +6,7 @@
 # Persons: Timothée Flutre [cre,aut]
 # Versioning: https://github.com/timflutre/insilicut
 
-progVersion="1.0.1" # http://semver.org/
+progVersion="1.1.0" # http://semver.org/
 
 # Display the help on stdout.
 # The format complies with help2man (http://www.gnu.org/s/help2man)
@@ -25,6 +25,7 @@ function help () {
   msg+="      --en\tname of the enzyme (e.g. 'ApeKI')\n"
   msg+="      --ls\tlower bound on fragments size (default=100)\n"
   msg+="      --us\tupper bound on fragments size (default=300)\n"
+  msg+="      --fullh\tuse full fasta header (e.g. keep \"chr1 Atha\" instead of \"chr1\")\n"
   msg+="      --clean\tremove temporary files\n"
   msg+="      --p2i\tabsolute path to the insilicut directory (default="")\n"
   msg+="\t\tused for testing purposes only (e.g. in 'make check')\n"
@@ -75,7 +76,7 @@ function timer () {
 function parseCmdLine () {
   getopt -T > /dev/null # portability check (say, Linux or Mac OS?)
   if [ $? -eq 4 ]; then # GNU enhanced getopt is available
-	  TEMP=`getopt -o hVv:g:e: -l help,version,verbose:,gf:,gn:,ef:,en:,ls:,us:,clean,p2i: -n "$0" -- "$@"`
+	  TEMP=`getopt -o hVv:g:e: -l help,version,verbose:,gf:,gn:,ef:,en:,ls:,us:,fullh,clean,p2i: -n "$0" -- "$@"`
   else # original getopt is available (no long options, whitespace, sorting)
 	  TEMP=`getopt hVv: "$@"`
   fi
@@ -100,6 +101,7 @@ on your system, use -h for help"
 	    --en) enzymeName=$2; shift 2;;
 	    --ls) lowerSize=$2; shift 2;;
 	    --us) upperSize=$2; shift 2;;
+      --fullh) useFullHeader="yes"; shift;;
 	    --clean) cleanTmp=true; shift;;
 	    --p2i) pathToInsilicut=$2; shift 2;;
       --) shift; break;;
@@ -178,7 +180,11 @@ function run () {
 	    echo -e "convert output into BED format (with AWK)..."
 	  fi
 	  if [ ! -f "${tmpPrefix}.bed.gz" ]; then
-	    cat ${tmpPrefix}.txt | awk -F "\t" '{print $1"\t"$3-1"\t"$4"\t"$2"\t1000\t"$5}' | gzip > ${tmpPrefix}.bed.gz
+      if [ "${useFullHeader}" == "yes" ]; then
+	      cat ${tmpPrefix}.txt | awk -F "\t" '{print $1"\t"$3-1"\t"$4"\t"$2"\t1000\t"$5}' | gzip > ${tmpPrefix}.bed.gz
+      else
+        cat ${tmpPrefix}.txt | awk -F "\t" '{split($1,a," "); print a[1]"\t"$3-1"\t"$4"\t"$2"\t1000\t"$5}' | gzip > ${tmpPrefix}.bed.gz
+      fi
 	  fi
 	  if $cleanTmp; then
 	    rm -f ${tmpPrefix}.txt
@@ -218,6 +224,7 @@ enzymeFile=""
 enzymeName=""
 lowerSize="100"
 upperSize="300"
+useFullHeader="no"
 cleanTmp=false
 pathToInsilicut=""
 parseCmdLine "$@"
@@ -230,7 +237,7 @@ if [ $verbose -gt "0" ]; then
   echo -e $msg
 fi
 
-run genomeFile genomeName enzymeFile enzymeName lowerSize upperSize cleanTmp pathToInsilicut verbose
+run genomeFile genomeName enzymeFile enzymeName lowerSize upperSize useFullHeader cleanTmp pathToInsilicut verbose
 
 if [ $verbose -gt "0" ]; then
   msg="END ${0##*/} ${progVersion} $(date +"%Y-%m-%d") $(date +"%H:%M:%S")"
