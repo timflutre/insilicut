@@ -30,7 +30,7 @@ if sys.version_info[0] == 2:
         sys.stderr.write("%s\n\n" % msg)
         sys.exit(1)
         
-progVersion = "1.0.0" # http://semver.org/
+progVersion = "1.1.1" # http://semver.org/
 
 
 class Bed(object):
@@ -185,9 +185,10 @@ class ExtractFragments(object):
             if self.verbose > 0:
                 msg = "%s: %i cuts" % (chrom, len(dChr2sites[chrom]))
             dChr2sites[chrom].sort(key=lambda x: x.start)
-            lFrags.append(Bed(chrom, 0, dChr2sites[chrom][0].start,
-                              dChr2sites[chrom][0].name))
-            nbFrags = 1
+            nbFrags = 0
+            # lFrags.append(Bed(chrom, 0, dChr2sites[chrom][0].start,
+            #                   dChr2sites[chrom][0].name))
+            nbFrags += 1
             for i in xrange(1, len(dChr2sites[chrom])):
                 if dChr2sites[chrom][i-1].end < dChr2sites[chrom][i].start:
                     lFrags.append(Bed(chrom, dChr2sites[chrom][i-1].end,

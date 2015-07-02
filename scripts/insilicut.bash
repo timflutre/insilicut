@@ -6,7 +6,7 @@
 # Persons: Timothée Flutre [cre,aut]
 # Versioning: https://github.com/timflutre/insilicut
 
-progVersion="1.1.0" # http://semver.org/
+progVersion="1.1.1" # http://semver.org/
 
 # Display the help on stdout.
 # The format complies with help2man (http://www.gnu.org/s/help2man)
