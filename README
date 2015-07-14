@@ -2,21 +2,17 @@ Insilicut - in silico cutting of genomic DNA with restriction enzyme
 ====================================================================
 
 This directory contains insilicut, a minimal package reporting fragments when
-cutting in silico genomic DNA with a restriction enzyme. It is potentially 
-useful when planning a genotyping-by-sequencing (GBS) experiment (also known 
+cutting in silico genomic DNA with one restriction enzyme. It is potentially
+useful when planning a genotyping-by-sequencing (GBS) experiment (also known
 as restriction-assisted DNA sequencing, RAD-seq).
 
-This package (copyright INRA) is free software, you can redistribute it 
-and/or modify it under the terms of the GNU General Public License (GPL-3).
+The development of this package is funded by the Institut National de la
+Recherche Agronomique (INRA). The copyright is owned by INRA. See the COPYING
+file for usage permissions.
 
-The GNU General Public License does not permit this software to be
-redistributed in proprietary programs.
-
-This library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-The code is hosted online: https://github.com/timflutre/insilicut
+The content of this directory is versioned using git, the central repository
+being hosted on GitHub:
+https://github.com/timflutre/insilicut
 
 
 Installation

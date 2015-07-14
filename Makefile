@@ -1,5 +1,5 @@
 INSTALL=${HOME}
-VERSION=1.1.1
+VERSION=1.1.2
 
 all:
 	@echo "this package requires no compilation"
@@ -21,7 +21,7 @@ pdf: doc/insilicut.man
 
 dist:
 	mkdir -p insilicut-${VERSION}
-	cp AUTHORS COPYING Makefile NEWS README TODO insilicut-${VERSION}/
+	cp AUTHORS COPYING Makefile NEWS README insilicut-${VERSION}/
 	cp -r doc/ insilicut-${VERSION}/
 	cp -r scripts/ insilicut-${VERSION}/
 	mkdir -p insilicut-${VERSION}/tests; cp tests/test_func.bash insilicut-${VERSION}/tests/
