@@ -6,7 +6,7 @@
 # Persons: Timothée Flutre [cre,aut]
 # Versioning: https://github.com/timflutre/insilicut
 
-progVersion="1.1.2" # http://semver.org/
+progVersion="1.2.0" # http://semver.org/
 
 # Display the help on stdout.
 # The format complies with help2man (http://www.gnu.org/s/help2man)
@@ -194,18 +194,41 @@ function run () {
 	  if [ $verbose -gt "0" ]; then
 	    echo -e "extract fragments (with Python)..."
 	  fi
-	  if [ ! -f "${tmpPrefix}_frags.bed.gz" ]; then
-	    ${pathToInsilicut}insilicut_extract_fragments.py -i ${tmpPrefix}.bed.gz -s ${lowerSize} -S ${upperSize} -v ${verbose} >& stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt
-	    if [ $verbose -gt "0" ]; then
-		    echo -e $(grep "nb of kept fragments" stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt)
-		    echo -e "more details in file stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt"
-	    fi
-	  fi
-	  if $cleanTmp; then
-	    rm -f ${tmpPrefix}.bed.gz
+	  if [ -f "${tmpPrefix}_frags.bed.gz" ]; then
+      rm -f "${tmpPrefix}_frags.bed.gz"
+    fi
+	  ${pathToInsilicut}insilicut_extract_fragments.py -i ${tmpPrefix}.bed.gz -s ${lowerSize} -S ${upperSize} -v ${verbose} >& stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt
+	  if [ $verbose -gt "0" ]; then
+      echo -e $(grep "nb of fragments" stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt | awk -F"(" '{print $1}')
+		  echo -e $(grep "nb of kept fragments" stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt)
+		  echo -e "more details in file stdout_extract_fragments_${genomeName}_${enzymeName}_e-0_g-0_a_s-${lowerSize}_S-${upperSize}.txt"
 	  fi
 	  
 	  # step 4 ------------------------------------------------------------------
+	  if [ $verbose -gt "0" ]; then
+		  echo -e "calculate (approx) genome coverage corresponding to fragments..."
+      genomeSize=$(cat ${genomeFile} | awk 'BEGIN{RS=">"} {split($0,a,"\n"); if(length(a)==0)next; for(i=2;i<=length(a);++i){sum+=length(a[i])}} END{print sum}')
+      minFragSize[1]="0"
+      maxFragSize[1]="10000"
+      minFragSize[2]="10"
+      maxFragSize[2]="1000"
+      minFragSize[3]="50"
+      maxFragSize[3]="500"
+      minFragSize[4]="50"
+      maxFragSize[4]="200"
+      echo -e "minFragSize\tmaxFragSize\tnbFrags\tgenomeCov"
+      for i in {1..4}; do
+        nbFrags=$(zcat ${tmpPrefix}_frags.bed.gz | awk -v mi=${minFragSize[i]} -v ma=${maxFragSize[i]} -F"\t" '{l=$3-$2; if(l >= mi && l <= ma)sum+=1} END{print sum}')
+        fragSize=$(zcat ${tmpPrefix}_frags.bed.gz | awk -v mi=${minFragSize[i]} -v ma=${maxFragSize[i]} -F"\t" '{l=$3-$2; if(l >= mi && l <= ma)sum+=l} END{print sum}')
+        gecovPerc=$(echo "scale=2; 100 * ${fragSize} / ${genomeSize}" | bc -l)
+        echo -e ${minFragSize[$i]}"\t"${maxFragSize[$i]}"\t"${nbFrags}"\t"${gecovPerc}"%"
+      done
+      fi
+	  if $cleanTmp; then
+	    rm -f ${tmpPrefix}.bed.gz
+	  fi
+    
+	  # step 5 ------------------------------------------------------------------
 	  if hash R 2>/dev/null; then
 	    if [ $verbose -gt "0" ]; then
 		    echo -e "plot histogram of kept fragment sizes (with R)..."
