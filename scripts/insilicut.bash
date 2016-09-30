@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 # Aim: report fragments when cutting genomic DNA with a restriction enzyme
-# Copyright (C) 2014-2015 Institut National de la Recherche Agronomique (INRA)
+# Copyright (C) 2014-2016 Institut National de la Recherche Agronomique (INRA)
 # License: GPL-3+
 # Persons: Timothée Flutre [cre,aut]
 # Versioning: https://github.com/timflutre/insilicut
 
-progVersion="1.2.0" # http://semver.org/
+progVersion="1.3.0" # http://semver.org/
 
 # Display the help on stdout.
 # The format complies with help2man (http://www.gnu.org/s/help2man)
@@ -45,7 +45,7 @@ function help () {
 function version () {
   msg="${0##*/} ${progVersion}\n"
   msg+="\n"
-  msg+="Copyright (C) 2014-2015 Institut National de la Recherche Agronomique (INRA).\n"
+  msg+="Copyright (C) 2014-2016 Institut National de la Recherche Agronomique (INRA).\n"
   msg+="License GPL-3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
   msg+="This is free software; see the source for copying conditions. There is NO\n"
   msg+="warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
@@ -216,8 +216,10 @@ function run () {
       maxFragSize[3]="500"
       minFragSize[4]="50"
       maxFragSize[4]="200"
+      minFragSize[5]=${lowerSize}
+      maxFragSize[5]=${upperSize}
       echo -e "minFragSize\tmaxFragSize\tnbFrags\tgenomeCov"
-      for i in {1..4}; do
+      for i in {1..5}; do
         nbFrags=$(zcat ${tmpPrefix}_frags.bed.gz | awk -v mi=${minFragSize[i]} -v ma=${maxFragSize[i]} -F"\t" '{l=$3-$2; if(l >= mi && l <= ma)sum+=1} END{print sum}')
         fragSize=$(zcat ${tmpPrefix}_frags.bed.gz | awk -v mi=${minFragSize[i]} -v ma=${maxFragSize[i]} -F"\t" '{l=$3-$2; if(l >= mi && l <= ma)sum+=l} END{print sum}')
         gecovPerc=$(echo "scale=2; 100 * ${fragSize} / ${genomeSize}" | bc -l)
